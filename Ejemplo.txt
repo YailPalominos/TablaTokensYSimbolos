@@ -1,0 +1,6 @@
+int a,b,c;
+float x,z;
+a=b*c;
+a=2*a;
+Escribir(a);
+Leer(z);
