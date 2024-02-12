@@ -9,28 +9,20 @@ public class TablaTokens {
     List<Token> tablaTokens = new ArrayList<>();
     private int linea = 1;
     // Patrones
-    Pattern patronCambioLinea = Pattern.compile("\n");
-
-    // Usar los siguientes patrones para el analisis
-    // Pattern patronIniciarVariables = Pattern
-    // .compile("((Real|Entero)
-    // (([a-zA-Z0-9]+)\\,)(([a-zA-Z0-9]+)\\,)*(([a-zA-Z0-9]+)\\;))");
-    // Pattern patronleerOEscribirVariables =
-    // Pattern.compile("((Leer|Escribir)\\(([a-zA-Z0-9]*\\))\\;)");
-    // Pattern patronOperacion = Pattern.compile(
-    // "(\\w+)\\s*=\\s*((?:\\d+(?:\\.\\d+)?)|\\w+)\\s*((?:[-+*/]\\s*((?:\\d+(?:\\.\\d+)?)|\\w+)\\s*)+)(\\s*(\\([^()]+\\)|\\[[^\\[\\]]+\\]))?\\s*;");
+    private Pattern patronCambioLinea = Pattern.compile("\n");
 
     /*
      * Constructor de la tabla de tokens
      */
     public TablaTokens(String codigoFuente) {
         this.codigoFuente = codigoFuente;
+        Analizar();
     }
 
     /*
      * Analiza el codigo fuente para obtener los tokens
      */
-    public void Analizar() {
+    private void Analizar() {
         char[] caracteres = codigoFuente.toCharArray();
         String palabra = "";
         for (int indice = 0; indice < caracteres.length; indice++) {
