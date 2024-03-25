@@ -1,0 +1,26 @@
+----------------------------------------------------
+               Tabla de tokens
+----------------------------------------------------
+               Valor                 Tipo
+----------------------------------------------------
+               float    Palabra reservada
+                   a        Identificador
+                   ,                 Coma
+                   b        Identificador
+                   ;         Punto y coma
+                   2      Cambio de linea
+                 int    Palabra reservada
+                   c        Identificador
+                   ,                 Coma
+                   d        Identificador
+                   ;         Punto y coma
+                   3      Cambio de linea
+                   a        Identificador
+                   =           Asignación
+                   b        Identificador
+                   /             División
+                   c        Identificador
+                   +                 Suma
+                   d        Identificador
+                   ;         Punto y coma
+----------------------------------------------------

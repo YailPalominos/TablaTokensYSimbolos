@@ -6,8 +6,9 @@ import java.util.regex.Pattern;
 public class TablaSimbolos {
 
     public List<Token> tablaTokens = new ArrayList<>();
-    public List<Simbolo> tablaSimbolos = new ArrayList<>();
-    private int linea = 1;
+    public static List<Simbolo> tablaSimbolos = new ArrayList<>();
+    static int linea = 1;
+    static int posLectura = 0;
     // Expresiones regulares usadas en el analisis.
     Pattern patronIniciarVariables = Pattern
             .compile("((float|int)\\s(([a-zA-Z0-9]+)\\,)(([a-zA-Z0-9]+)\\,)*(([a-zA-Z0-9]+)\\;))");
@@ -29,12 +30,14 @@ public class TablaSimbolos {
     private void Analizar() {
         String cadena = "";
         for (Token token : tablaTokens) {
+            posLectura += token.Valor.length();
             cadena += token.Valor
                     + (token.Tipo.equals("Palabra reservada") && !token.Valor.equals("Escribir")
                             && !token.Valor.equals("Leer") ? " " : "");
             if (token.Tipo.equals("Cambio de linea")) {
                 linea++;
                 cadena = "";
+                posLectura = 0;
             } else {
                 if (token.Tipo.equals("Constante")) {
                     String tipo = !cadena.contains(".") ? "int" : "float";
@@ -42,11 +45,19 @@ public class TablaSimbolos {
                 }
                 if (validar(cadena) == true) {
                     cadena = "";
+                } else {
+                    if (cadena.contains(";")) {
+                        GenerarError("Error Semántico", cadena, "No contiene tipo " + cadena);
+                        break;
+                    }
                 }
             }
         }
     }
 
+    /*
+     * Agrega un nuevo simbolo a la tabla
+     */
     private void agregarSimbolo(String token, String tipo, String valor) {
         if (verificarToken(token)) {
             Simbolo simbolo = new Simbolo();
@@ -56,14 +67,26 @@ public class TablaSimbolos {
             simbolo.Linea = "" + linea;
             simbolo.Valor = valor;
             tablaSimbolos.add(simbolo);
+        } else {
+            GenerarError("Error Semántico", token, "El token ya fue previamente inicializado");
         }
+    }
+
+    public static void GenerarError(String tipoError, String cadena, String error) {
+        System.out.println();
+        System.out.format("%10s %10s %10s %10s",
+                "\033[31m" + tipoError + ": \033[0m" + "(" + "\033[34m" + cadena + "\033[0m" + ") " + error,
+                "Linea " + linea,
+                " Inicia " + (posLectura - (cadena.length() - 1)), " Termina " + (posLectura + 1));
+        System.out.println();
+        return;
     }
 
     /*
      * Comprueba que exista el Token en caso de existir añade una repeticion y no se
      * crea
      */
-    private boolean verificarToken(String token) {
+    private static boolean verificarToken(String token) {
         for (Simbolo simbolo : tablaSimbolos) {
             if (simbolo.Token.equals(token)) {
                 simbolo.Repeticiones++;
@@ -72,6 +95,44 @@ public class TablaSimbolos {
             }
         }
         return true;
+    }
+
+    private static boolean verificarExistencia(String token) {
+        for (Simbolo simbolo : tablaSimbolos) {
+            if (simbolo.Token.equals(token)) {
+                return true;
+            }
+        }
+        GenerarError("Error Semántico", token, "No se encontró el token en la tabla de símbolos.");
+        return false;
+    }
+
+    /*
+     * Retorna objeto tipo Simbolo correspondiente al token
+     */
+    public static Simbolo obtenerSimbolo(String token) {
+        if (verificarExistencia(token)) {
+            for (Simbolo simbolo : tablaSimbolos) {
+                if (simbolo.Token.equals(token)) {
+                    return simbolo;
+                }
+            }
+        }
+        return null;
+    }
+
+    /*
+     * Lee un token sin añadir una repetición si no existe añade un error
+     * 
+     */
+    static String LeerToken(String token) {
+        for (Simbolo simbolo : tablaSimbolos) {
+            if (simbolo.Token.equals(token)) {
+                return simbolo.Valor;
+            }
+        }
+        GenerarError("Error semántico", token, "No se encontro el token en la tabla de simbolos");
+        return "";
     }
 
     private boolean validar(String cadena) {
@@ -92,12 +153,18 @@ public class TablaSimbolos {
             }
             return true;
         } else if (matcherleerOEscribirVariables.find()) {
+            boolean esLectura = cadena.contains("Leer") ? true : false;
             cadena = cadena.replace("Leer", "");
             cadena = cadena.replace("Escribir", "");
             cadena = cadena.replace("(", "");
             cadena = cadena.replace(")", "");
             cadena = cadena.replace(";", "");
-            verificarToken(cadena);
+            if (esLectura) {
+                verificarToken(cadena);
+            } else {
+                System.out.println(LeerToken(cadena));
+            }
+
             return true;
         } else if (matcherOperacion.find()) {
             String[] partes = cadena.split("=");
@@ -108,6 +175,7 @@ public class TablaSimbolos {
             for (String operando : operandos) {
                 verificarToken(operando);
             }
+            AnalisisSemantico.AnalizarOperacion(cadena);
             return true;
         } else {
             return false;

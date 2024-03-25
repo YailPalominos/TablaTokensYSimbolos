@@ -33,6 +33,18 @@ public class Ejecucion {
                         System.out.format("%20s %20s", token.Valor, token.Tipo);
                         System.out.println();
                 }
+                // Formato para guardar los resultados de la tabla de tokens
+                StringBuilder contenidoTablaTokens = new StringBuilder();
+                contenidoTablaTokens.append("----------------------------------------------------\n");
+                contenidoTablaTokens.append(String.format("%30s", "Tabla de tokens") + "\n");
+                contenidoTablaTokens.append("----------------------------------------------------\n");
+                contenidoTablaTokens.append(String.format("%20s %20s", "Valor", "Tipo") + "\n");
+                contenidoTablaTokens.append("----------------------------------------------------\n");
+                for (Token token : tablaTokens) {
+                        contenidoTablaTokens.append(String.format("%20s %20s", token.Valor, token.Tipo) + "\n");
+                }
+                contenidoTablaTokens.append("----------------------------------------------------\n");
+                Generacion.GenerarArchivo("/Resultados/TablaTokens.txt", contenidoTablaTokens.toString());
                 System.out.println(
                                 "----------------------------------------------------");
                 TablaSimbolos tablaSimbolo = new TablaSimbolos(tablaTokens);
@@ -55,6 +67,25 @@ public class Ejecucion {
                 }
                 System.out.println(
                                 "-----------------------------------------------------------------------------------------");
+                // Formato para guardar los resultados de la tabla de simbolos
+                StringBuilder contenidoTablaSimbolos = new StringBuilder();
+                contenidoTablaSimbolos.append(
+                                "-----------------------------------------------------------------------------------------\n");
+                contenidoTablaSimbolos.append(String.format("%45s", "Tabla de simbolos") + "\n");
+                contenidoTablaSimbolos.append(
+                                "-----------------------------------------------------------------------------------------\n");
+                contenidoTablaSimbolos.append(String.format("%15s %15s %15s %15s %15s", "Token", "Tipo", "Repeticiones",
+                                "Línea", "Valor") + "\n");
+                contenidoTablaSimbolos.append(
+                                "-----------------------------------------------------------------------------------------\n");
+                for (Simbolo simbolo : tablaSimbolos) {
+                        contenidoTablaSimbolos.append(String.format("%15s %15s %15s %15s %15s", simbolo.Token,
+                                        simbolo.Tipo, simbolo.Repeticiones, simbolo.Linea, simbolo.Valor) + "\n");
+                }
+                contenidoTablaSimbolos.append(
+                                "-----------------------------------------------------------------------------------------\n");
+                Generacion.GenerarArchivo("/Resultados/TablaSimbolos.txt", contenidoTablaSimbolos.toString());
+
         }
 
         public static String ObtenerCodigoFuente(String rutaEstatica) throws IOException {
